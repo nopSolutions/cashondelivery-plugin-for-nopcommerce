@@ -12,6 +12,8 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 {
     public class PaymentCashOnDeliveryController : BasePaymentController
     {
+        #region Fields
+
         private readonly IWorkContext _workContext;
         private readonly IStoreService _storeService;
         private readonly ISettingService _settingService;
@@ -19,6 +21,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly ILanguageService _languageService;
 
+        #endregion
+
+        #region Ctor
 
         public PaymentCashOnDeliveryController(IWorkContext workContext,
             IStoreService storeService, 
@@ -34,7 +39,11 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             this._localizationService = localizationService;
             this._languageService = languageService;
         }
-        
+
+        #endregion
+
+        #region Methods
+
         [AdminAuthorize]
         [ChildActionOnly]
         public ActionResult Configure()
@@ -43,18 +52,19 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
             var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
 
-            var model = new ConfigurationModel();
-            model.DescriptionText = cashOnDeliveryPaymentSettings.DescriptionText;
+            var model = new ConfigurationModel {DescriptionText = cashOnDeliveryPaymentSettings.DescriptionText};
+
             //locales
             AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
                 locale.DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x => x.DescriptionText, languageId, false, false);
             });
+
             model.AdditionalFee = cashOnDeliveryPaymentSettings.AdditionalFee;
             model.AdditionalFeePercentage = cashOnDeliveryPaymentSettings.AdditionalFeePercentage;
             model.ShippableProductRequired = cashOnDeliveryPaymentSettings.ShippableProductRequired;
-
             model.ActiveStoreScopeConfiguration = storeScope;
+
             if (storeScope > 0)
             {
                 model.DescriptionText_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.DescriptionText, storeScope);
@@ -87,25 +97,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
-            if (model.DescriptionText_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, storeScope, false);
-            else if (storeScope > 0)
-                _settingService.DeleteSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, storeScope);
-
-            if (model.AdditionalFee_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, storeScope, false);
-            else if (storeScope > 0)
-                _settingService.DeleteSetting(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, storeScope);
-
-            if (model.AdditionalFeePercentage_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, storeScope, false);
-            else if (storeScope > 0)
-                _settingService.DeleteSetting(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
-
-            if (model.ShippableProductRequired_OverrideForStore || storeScope == 0)
-                _settingService.SaveSetting(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, storeScope, false);
-            else if (storeScope > 0)
-                _settingService.DeleteSetting(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, storeScope);
+             _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x=>x.DescriptionText, model.DescriptionText_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, model.AdditionalFee_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, model.AdditionalFeePercentage_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, model.ShippableProductRequired_OverrideForStore, storeScope, false);
 
             //now clear settings cache
             _settingService.ClearCache();
@@ -140,6 +135,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         public override IList<string> ValidatePaymentForm(FormCollection form)
         {
             var warnings = new List<string>();
+
             return warnings;
         }
 
@@ -147,7 +143,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         public override ProcessPaymentRequest GetPaymentInfo(FormCollection form)
         {
             var paymentInfo = new ProcessPaymentRequest();
+
             return paymentInfo;
         }
+
+        #endregion
     }
 }

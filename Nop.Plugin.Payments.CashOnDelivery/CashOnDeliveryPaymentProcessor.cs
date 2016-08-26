@@ -18,19 +18,22 @@ namespace Nop.Plugin.Payments.CashOnDelivery
     public class CashOnDeliveryPaymentProcessor : BasePlugin, IPaymentMethod
     {
         #region Fields
-        private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
+        
         private readonly ISettingService _settingService;
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
+
         #endregion
 
         #region Ctor
 
-        public CashOnDeliveryPaymentProcessor(CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
-            ISettingService settingService, IOrderTotalCalculationService orderTotalCalculationService)
+        public CashOnDeliveryPaymentProcessor(ISettingService settingService, 
+            IOrderTotalCalculationService orderTotalCalculationService,
+            CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings)
         {
-            this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
             this._settingService = settingService;
             this._orderTotalCalculationService = orderTotalCalculationService;
+            this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
         }
 
         #endregion
@@ -44,8 +47,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>Process payment result</returns>
         public ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
         {
-            var result = new ProcessPaymentResult();
-            result.NewPaymentStatus = PaymentStatus.Pending;
+            var result = new ProcessPaymentResult {NewPaymentStatus = PaymentStatus.Pending};
+
+
             return result;
         }
 
@@ -68,11 +72,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-
-            if (_cashOnDeliveryPaymentSettings.ShippableProductRequired && !cart.RequiresShipping())
-                return true;
-
-            return false;
+            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !cart.RequiresShipping();
         }
 
         /// <summary>
@@ -84,6 +84,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         {
             var result = this.CalculateAdditionalFee(_orderTotalCalculationService, cart,
                 _cashOnDeliveryPaymentSettings.AdditionalFee, _cashOnDeliveryPaymentSettings.AdditionalFeePercentage);
+
             return result;
         }
 
@@ -95,7 +96,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public CapturePaymentResult Capture(CapturePaymentRequest capturePaymentRequest)
         {
             var result = new CapturePaymentResult();
+
             result.AddError("Capture method not supported");
+
             return result;
         }
 
@@ -107,7 +110,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public RefundPaymentResult Refund(RefundPaymentRequest refundPaymentRequest)
         {
             var result = new RefundPaymentResult();
+
             result.AddError("Refund method not supported");
+
             return result;
         }
 
@@ -119,7 +124,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public VoidPaymentResult Void(VoidPaymentRequest voidPaymentRequest)
         {
             var result = new VoidPaymentResult();
+
             result.AddError("Void method not supported");
+
             return result;
         }
 
@@ -131,7 +138,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public ProcessPaymentResult ProcessRecurringPayment(ProcessPaymentRequest processPaymentRequest)
         {
             var result = new ProcessPaymentResult();
+
             result.AddError("Recurring payment not supported");
+
             return result;
         }
 
@@ -143,7 +152,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public CancelRecurringPaymentResult CancelRecurringPayment(CancelRecurringPaymentRequest cancelPaymentRequest)
         {
             var result = new CancelRecurringPaymentResult();
+
             result.AddError("Recurring payment not supported");
+
             return result;
         }
 
@@ -198,6 +209,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             {
                 DescriptionText = "<p>In cases where an order is placed, an authorized representative will contact you, personally or over telephone, to confirm the order.<br />After the order is confirmed, it will be processed.<br />Orders once confirmed, cannot be cancelled.</p><p>P.S. You can edit this text from admin panel.</p>"
             };
+
             _settingService.SaveSetting(settings);
 
             this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText", "Description");
