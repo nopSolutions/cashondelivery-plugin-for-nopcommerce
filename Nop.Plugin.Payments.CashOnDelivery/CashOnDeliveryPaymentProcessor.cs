@@ -22,6 +22,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         private readonly ISettingService _settingService;
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
+        private readonly ILocalizationService _localizationService;
 
         #endregion
 
@@ -29,11 +30,13 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
         public CashOnDeliveryPaymentProcessor(ISettingService settingService, 
             IOrderTotalCalculationService orderTotalCalculationService,
-            CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings)
+            CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
+            ILocalizationService localizationService)
         {
             this._settingService = settingService;
             this._orderTotalCalculationService = orderTotalCalculationService;
             this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
+            this._localizationService = localizationService;
         }
 
         #endregion
@@ -220,7 +223,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint", "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
             this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
-
+            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
             
             base.Install();
         }
@@ -239,6 +242,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint");
             this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
             this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
+            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
             
             base.Uninstall();
         }
@@ -324,7 +328,15 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             }
         }
 
+        /// <summary>
+        /// Gets a payment method description that will be displayed on checkout pages in the public store
+        /// </summary>
+        public string PaymentMethodDescription
+        {
+            get { return _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription"); }
+        }
+
         #endregion
-        
+
     }
 }

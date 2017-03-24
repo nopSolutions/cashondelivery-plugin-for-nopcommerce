@@ -57,7 +57,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             //locales
             AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
-                locale.DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x => x.DescriptionText, languageId, false, false);
+                locale.DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x => x.DescriptionText, languageId, 0, false, false);
             });
 
             model.AdditionalFee = cashOnDeliveryPaymentSettings.AdditionalFee;
@@ -73,7 +73,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
                 model.ShippableProductRequired_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, storeScope);
             }
 
-            return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentCashOnDelivery/Configure.cshtml", model);
+            return View("~/Plugins/Payments.CashOnDelivery/Views/Configure.cshtml", model);
         }
 
         [HttpPost]
@@ -125,10 +125,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 
             var model = new PaymentInfoModel
             {
-                DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x=>x.DescriptionText, _workContext.WorkingLanguage.Id)
+                DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x=>x.DescriptionText, _workContext.WorkingLanguage.Id, 0)
             };
 
-            return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentCashOnDelivery/PaymentInfo.cshtml", model);
+            return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentInfo.cshtml", model);
         }
 
         [NonAction]
