@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
-using Nop.Services.Payments;
+using Nop.Services.Security;
 using Nop.Services.Stores;
+using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
+using Nop.Web.Framework.Mvc.Filters;
 
 namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 {
+    [AuthorizeAdmin]
+    [Area(AreaNames.Admin)]
     public class PaymentCashOnDeliveryController : BasePaymentController
     {
         #region Fields
@@ -17,9 +20,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         private readonly IWorkContext _workContext;
         private readonly IStoreService _storeService;
         private readonly ISettingService _settingService;
-        private readonly IStoreContext _storeContext;
         private readonly ILocalizationService _localizationService;
         private readonly ILanguageService _languageService;
+        private readonly IPermissionService _permissionService;
 
         #endregion
 
@@ -28,26 +31,27 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         public PaymentCashOnDeliveryController(IWorkContext workContext,
             IStoreService storeService, 
             ISettingService settingService,
-            IStoreContext storeContext,
             ILocalizationService localizationService,
-            ILanguageService languageService)
+            ILanguageService languageService,
+            IPermissionService permissionService)
         {
             this._workContext = workContext;
             this._storeService = storeService;
             this._settingService = settingService;
-            this._storeContext = storeContext;
             this._localizationService = localizationService;
             this._languageService = languageService;
+            this._permissionService = permissionService;
         }
 
         #endregion
 
         #region Methods
 
-        [AdminAuthorize]
-        [ChildActionOnly]
-        public ActionResult Configure()
+        public IActionResult Configure()
         {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+                return AccessDeniedView();
+
             //load settings for a chosen store scope
             var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
             var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
@@ -77,10 +81,11 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         }
 
         [HttpPost]
-        [AdminAuthorize]
-        [ChildActionOnly]
-        public ActionResult Configure(ConfigurationModel model)
+        public IActionResult Configure(ConfigurationModel model)
         {
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+                return AccessDeniedView();
+
             if (!ModelState.IsValid)
                 return Configure();
 
@@ -116,35 +121,6 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
 
             return Configure();
-        }
-
-        [ChildActionOnly]
-        public ActionResult PaymentInfo()
-        {
-            var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(_storeContext.CurrentStore.Id);
-
-            var model = new PaymentInfoModel
-            {
-                DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x=>x.DescriptionText, _workContext.WorkingLanguage.Id, 0)
-            };
-
-            return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentInfo.cshtml", model);
-        }
-
-        [NonAction]
-        public override IList<string> ValidatePaymentForm(FormCollection form)
-        {
-            var warnings = new List<string>();
-
-            return warnings;
-        }
-
-        [NonAction]
-        public override ProcessPaymentRequest GetPaymentInfo(FormCollection form)
-        {
-            var paymentInfo = new ProcessPaymentRequest();
-
-            return paymentInfo;
         }
 
         #endregion

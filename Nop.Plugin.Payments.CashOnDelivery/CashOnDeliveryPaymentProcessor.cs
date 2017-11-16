@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Web.Routing;
+using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Core.Plugins;
@@ -9,6 +9,7 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
+using Microsoft.AspNetCore.Http;
 
 namespace Nop.Plugin.Payments.CashOnDelivery
 {
@@ -23,6 +24,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
         private readonly ILocalizationService _localizationService;
+        private readonly IWebHelper _webHelper;
 
         #endregion
 
@@ -31,12 +33,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public CashOnDeliveryPaymentProcessor(ISettingService settingService, 
             IOrderTotalCalculationService orderTotalCalculationService,
             CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IWebHelper webHelper)
         {
             this._settingService = settingService;
             this._orderTotalCalculationService = orderTotalCalculationService;
             this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
             this._localizationService = localizationService;
+            this._webHelper = webHelper;
         }
 
         #endregion
@@ -169,37 +173,32 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public bool CanRePostProcessPayment(Order order)
         {
             if (order == null)
-                throw new ArgumentNullException("order");
+                throw new ArgumentNullException(nameof(order));
 
             //it's not a redirection payment method. So we always return false
             return false;
         }
 
-        /// <summary>
-        /// Gets a route for provider configuration
-        /// </summary>
-        /// <param name="actionName">Action name</param>
-        /// <param name="controllerName">Controller name</param>
-        /// <param name="routeValues">Route values</param>
-        public void GetConfigurationRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+      
+        public IList<string> ValidatePaymentForm(IFormCollection form)
         {
-            actionName = "Configure";
-            controllerName = "PaymentCashOnDelivery";
-            routeValues = new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Payments.CashOnDelivery.Controllers" }, { "area", null } };
+            var warnings = new List<string>();
+
+            return warnings;
+        }
+        
+        public ProcessPaymentRequest GetPaymentInfo(IFormCollection form)
+        {
+            var paymentInfo = new ProcessPaymentRequest();
+
+            return paymentInfo;
         }
 
-        /// <summary>
-        /// Gets a route for payment info
-        /// </summary>
-        /// <param name="actionName">Action name</param>
-        /// <param name="controllerName">Controller name</param>
-        /// <param name="routeValues">Route values</param>
-        public void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        public override string GetConfigurationPageUrl()
         {
-            actionName = "PaymentInfo";
-            controllerName = "PaymentCashOnDelivery";
-            routeValues = new RouteValueDictionary { { "Namespaces", "Nop.Plugin.Payments.CashOnDelivery.Controllers" }, { "area", null } };
+            return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
         }
+        
 
         public Type GetControllerType()
         {
@@ -245,6 +244,11 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
             
             base.Uninstall();
+        }
+
+        public void GetPublicViewComponent(out string viewComponentName)
+        {
+            viewComponentName = "PaymentCashOnDelivery";
         }
 
         #endregion
