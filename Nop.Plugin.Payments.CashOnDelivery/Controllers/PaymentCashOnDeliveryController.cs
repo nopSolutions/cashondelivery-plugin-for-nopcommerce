@@ -4,7 +4,6 @@ using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Security;
-using Nop.Services.Stores;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
@@ -17,8 +16,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
     {
         #region Fields
 
-        private readonly IWorkContext _workContext;
-        private readonly IStoreService _storeService;
+        private readonly IStoreContext _storeContext;
         private readonly ISettingService _settingService;
         private readonly ILocalizationService _localizationService;
         private readonly ILanguageService _languageService;
@@ -28,15 +26,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 
         #region Ctor
 
-        public PaymentCashOnDeliveryController(IWorkContext workContext,
-            IStoreService storeService, 
+        public PaymentCashOnDeliveryController(
+            IStoreContext storeContext,
             ISettingService settingService,
             ILocalizationService localizationService,
             ILanguageService languageService,
             IPermissionService permissionService)
         {
-            this._workContext = workContext;
-            this._storeService = storeService;
+            this._storeContext = storeContext;
             this._settingService = settingService;
             this._localizationService = localizationService;
             this._languageService = languageService;
@@ -53,15 +50,18 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
                 return AccessDeniedView();
 
             //load settings for a chosen store scope
-            var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
             var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
 
-            var model = new ConfigurationModel {DescriptionText = cashOnDeliveryPaymentSettings.DescriptionText};
+            var model = new ConfigurationModel
+            {
+                DescriptionText = cashOnDeliveryPaymentSettings.DescriptionText
+            };
 
             //locales
             AddLocales(_languageService, model.Locales, (locale, languageId) =>
             {
-                locale.DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x => x.DescriptionText, languageId, 0, false, false);
+                locale.DescriptionText = _localizationService.GetLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, languageId, 0, false, false);
             });
 
             model.AdditionalFee = cashOnDeliveryPaymentSettings.AdditionalFee;
@@ -90,7 +90,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
                 return Configure();
 
             //load settings for a chosen store scope
-            var storeScope = this.GetActiveStoreScopeConfiguration(_storeService, _workContext);
+            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
             var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
 
             //save settings
@@ -102,7 +102,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
-             _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x=>x.DescriptionText, model.DescriptionText_OverrideForStore, storeScope, false);
+            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.DescriptionText, model.DescriptionText_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, model.AdditionalFee_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, model.AdditionalFeePercentage_OverrideForStore, storeScope, false);
             _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, model.ShippableProductRequired_OverrideForStore, storeScope, false);
@@ -113,7 +113,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             //localization. no multi-store support for localization yet.
             foreach (var localized in model.Locales)
             {
-                cashOnDeliveryPaymentSettings.SaveLocalizedSetting(x => x.DescriptionText,
+                _localizationService.SaveLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText,
                     localized.LanguageId,
                     localized.DescriptionText);
             }

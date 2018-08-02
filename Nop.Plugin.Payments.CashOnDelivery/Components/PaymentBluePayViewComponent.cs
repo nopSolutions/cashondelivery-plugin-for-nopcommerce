@@ -12,14 +12,17 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
     {
         private readonly IWorkContext _workContext;
         private readonly ISettingService _settingService;
+        private readonly ILocalizationService _localizationService;
         private readonly IStoreContext _storeContext;
 
         public PaymentCashOnDeliveryViewComponent(IWorkContext workContext,
             ISettingService settingService,
+            ILocalizationService localizationService,
             IStoreContext storeContext)
         {
             this._workContext = workContext;
             this._settingService = settingService;
+            this._localizationService = localizationService;
             this._storeContext = storeContext;
         }
 
@@ -29,7 +32,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
 
             var model = new PaymentInfoModel
             {
-                DescriptionText = cashOnDeliveryPaymentSettings.GetLocalizedSetting(x => x.DescriptionText, _workContext.WorkingLanguage.Id, 0)
+                DescriptionText = _localizationService.GetLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, _workContext.WorkingLanguage.Id, 0)
             };
 
             return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentInfo.cshtml", model);

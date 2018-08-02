@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
@@ -9,7 +10,6 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
-using Microsoft.AspNetCore.Http;
 
 namespace Nop.Plugin.Payments.CashOnDelivery
 {
@@ -19,9 +19,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery
     public class CashOnDeliveryPaymentProcessor : BasePlugin, IPaymentMethod
     {
         #region Fields
-        
+
         private readonly ISettingService _settingService;
-        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IPaymentService _paymentService;
         private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
         private readonly ILocalizationService _localizationService;
         private readonly IWebHelper _webHelper;
@@ -30,14 +31,17 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
         #region Ctor
 
-        public CashOnDeliveryPaymentProcessor(ISettingService settingService, 
-            IOrderTotalCalculationService orderTotalCalculationService,
+        public CashOnDeliveryPaymentProcessor(
+            ISettingService settingService,
+            IShoppingCartService shoppingCartService,
+            IPaymentService paymentService,
             CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
             ILocalizationService localizationService,
             IWebHelper webHelper)
         {
             this._settingService = settingService;
-            this._orderTotalCalculationService = orderTotalCalculationService;
+            this._shoppingCartService = shoppingCartService;
+            this._paymentService = paymentService;
             this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
             this._localizationService = localizationService;
             this._webHelper = webHelper;
@@ -55,7 +59,6 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
         {
             var result = new ProcessPaymentResult {NewPaymentStatus = PaymentStatus.Pending};
-
 
             return result;
         }
@@ -79,7 +82,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !cart.RequiresShipping();
+            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !_shoppingCartService.ShoppingCartRequiresShipping(cart);            
         }
 
         /// <summary>
@@ -89,7 +92,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>Additional handling fee</returns>
         public decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart)
         {
-            var result = this.CalculateAdditionalFee(_orderTotalCalculationService, cart,
+            var result = _paymentService.CalculateAdditionalFee(cart,
                 _cashOnDeliveryPaymentSettings.AdditionalFee, _cashOnDeliveryPaymentSettings.AdditionalFeePercentage);
 
             return result;
@@ -178,7 +181,6 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             //it's not a redirection payment method. So we always return false
             return false;
         }
-
       
         public IList<string> ValidatePaymentForm(IFormCollection form)
         {
@@ -197,8 +199,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public override string GetConfigurationPageUrl()
         {
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
-        }
-        
+        }        
 
         public Type GetControllerType()
         {
@@ -214,15 +215,15 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
             _settingService.SaveSetting(settings);
 
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText", "Description");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint", "Enter info that will be shown to customers during checkout");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee", "Additional fee");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint", "The additional fee.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage", "Additional fee. Use percentage");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint", "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
-            this.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText", "Description");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint", "Enter info that will be shown to customers during checkout");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee", "Additional fee");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint", "The additional fee.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage", "Additional fee. Use percentage");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint", "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
             
             base.Install();
         }
@@ -233,22 +234,26 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _settingService.DeleteSetting<CashOnDeliveryPaymentSettings>();
 
             //locales
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
-            this.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
             
             base.Uninstall();
         }
 
-        public void GetPublicViewComponent(out string viewComponentName)
+        /// <summary>
+        /// Gets a name of a view component for displaying plugin in public store ("payment info" checkout step)
+        /// </summary>
+        /// <returns>View component name</returns>
+        public string GetPublicViewComponentName()
         {
-            viewComponentName = "PaymentCashOnDelivery";
+            return "PaymentCashOnDelivery";
         }
 
         #endregion
@@ -341,6 +346,5 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         }
 
         #endregion
-
     }
 }
