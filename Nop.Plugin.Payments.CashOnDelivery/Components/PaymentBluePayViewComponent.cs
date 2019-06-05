@@ -10,21 +10,31 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
     [ViewComponent(Name = "PaymentCashOnDelivery")]
     public class PaymentCashOnDeliveryViewComponent : NopViewComponent
     {
-        private readonly IWorkContext _workContext;
-        private readonly ISettingService _settingService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IStoreContext _storeContext;
+        #region Fields
 
-        public PaymentCashOnDeliveryViewComponent(IWorkContext workContext,
+        private readonly ILocalizationService _localizationService;
+        private readonly ISettingService _settingService;
+        private readonly IStoreContext _storeContext;
+        private readonly IWorkContext _workContext;
+
+        #endregion
+
+        #region Ctor
+
+        public PaymentCashOnDeliveryViewComponent(ILocalizationService localizationService,
+            IStoreContext storeContext,
             ISettingService settingService,
-            ILocalizationService localizationService,
-            IStoreContext storeContext)
+            IWorkContext workContext)
         {
-            this._workContext = workContext;
-            this._settingService = settingService;
-            this._localizationService = localizationService;
-            this._storeContext = storeContext;
+            _workContext = workContext;
+            _settingService = settingService;
+            _localizationService = localizationService;
+            _storeContext = storeContext;
         }
+
+        #endregion
+
+        #region Methods
 
         public IViewComponentResult Invoke()
         {
@@ -37,5 +47,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
 
             return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentInfo.cshtml", model);
         }
+
+        #endregion
     }
 }

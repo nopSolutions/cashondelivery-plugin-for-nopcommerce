@@ -13,32 +13,36 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Models
 
         public int ActiveStoreScopeConfiguration { get; set; }
 
-        [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.DescriptionText")]
-        public string DescriptionText { get; set; }
-        public bool DescriptionText_OverrideForStore { get; set; }
-
         [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.AdditionalFee")]
         public decimal AdditionalFee { get; set; }
+
         public bool AdditionalFee_OverrideForStore { get; set; }
 
         [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage")]
         public bool AdditionalFeePercentage { get; set; }
+
         public bool AdditionalFeePercentage_OverrideForStore { get; set; }
+
+        [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.DescriptionText")]
+        public string DescriptionText { get; set; }
+
+        public bool DescriptionText_OverrideForStore { get; set; }
+
+        public IList<ConfigurationLocalizedModel> Locales { get; set; }
 
         [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.ShippableProductRequired")]
         public bool ShippableProductRequired { get; set; }
-        public bool ShippableProductRequired_OverrideForStore { get; set; }
 
-        public IList<ConfigurationLocalizedModel> Locales { get; set; }
+        public bool ShippableProductRequired_OverrideForStore { get; set; }
 
         #region Nested class
 
         public partial class ConfigurationLocalizedModel : ILocalizedLocaleModel
         {
-            public int LanguageId { get; set; }
-
             [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.DescriptionText")]
             public string DescriptionText { get; set; }
+
+            public int LanguageId { get; set; }
         }
 
         #endregion

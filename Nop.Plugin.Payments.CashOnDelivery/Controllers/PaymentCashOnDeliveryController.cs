@@ -3,6 +3,7 @@ using Nop.Core;
 using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
+using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
@@ -16,28 +17,30 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
     {
         #region Fields
 
-        private readonly IStoreContext _storeContext;
-        private readonly ISettingService _settingService;
-        private readonly ILocalizationService _localizationService;
         private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
+        private readonly INotificationService _notificationService;
         private readonly IPermissionService _permissionService;
+        private readonly ISettingService _settingService;
+        private readonly IStoreContext _storeContext;
 
         #endregion
 
         #region Ctor
 
-        public PaymentCashOnDeliveryController(
-            IStoreContext storeContext,
-            ISettingService settingService,
+        public PaymentCashOnDeliveryController(ILanguageService languageService,
             ILocalizationService localizationService,
-            ILanguageService languageService,
-            IPermissionService permissionService)
+            INotificationService notificationService,
+            IPermissionService permissionService,
+            ISettingService settingService,
+            IStoreContext storeContext)
         {
-            this._storeContext = storeContext;
-            this._settingService = settingService;
-            this._localizationService = localizationService;
-            this._languageService = languageService;
-            this._permissionService = permissionService;
+            _languageService = languageService;
+            _localizationService = localizationService;
+            _notificationService = notificationService;
+            _permissionService = permissionService;
+            _settingService = settingService;
+            _storeContext = storeContext;
         }
 
         #endregion
@@ -118,7 +121,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
                     localized.DescriptionText);
             }
 
-            SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
 
             return Configure();
         }

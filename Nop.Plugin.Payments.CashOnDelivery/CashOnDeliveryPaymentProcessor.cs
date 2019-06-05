@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
-using Nop.Core.Plugins;
 using Nop.Plugin.Payments.CashOnDelivery.Controllers;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
+using Nop.Services.Plugins;
 
 namespace Nop.Plugin.Payments.CashOnDelivery
 {
@@ -20,37 +20,36 @@ namespace Nop.Plugin.Payments.CashOnDelivery
     {
         #region Fields
 
-        private readonly ISettingService _settingService;
-        private readonly IShoppingCartService _shoppingCartService;
-        private readonly IPaymentService _paymentService;
         private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
         private readonly ILocalizationService _localizationService;
+        private readonly IPaymentService _paymentService;
+        private readonly ISettingService _settingService;
+        private readonly IShoppingCartService _shoppingCartService;
         private readonly IWebHelper _webHelper;
 
         #endregion
 
         #region Ctor
 
-        public CashOnDeliveryPaymentProcessor(
+        public CashOnDeliveryPaymentProcessor(CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
+            ILocalizationService localizationService,
+            IPaymentService paymentService,
             ISettingService settingService,
             IShoppingCartService shoppingCartService,
-            IPaymentService paymentService,
-            CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
-            ILocalizationService localizationService,
             IWebHelper webHelper)
         {
-            this._settingService = settingService;
-            this._shoppingCartService = shoppingCartService;
-            this._paymentService = paymentService;
-            this._cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
-            this._localizationService = localizationService;
-            this._webHelper = webHelper;
+            _cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
+            _localizationService = localizationService;
+            _paymentService = paymentService;
+            _settingService = settingService;
+            _shoppingCartService = shoppingCartService;
+            _webHelper = webHelper;
         }
 
         #endregion
-        
+
         #region Methods
-        
+
         /// <summary>
         /// Process a payment
         /// </summary>
@@ -58,7 +57,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>Process payment result</returns>
         public ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
         {
-            var result = new ProcessPaymentResult {NewPaymentStatus = PaymentStatus.Pending};
+            var result = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
 
             return result;
         }
@@ -82,7 +81,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !_shoppingCartService.ShoppingCartRequiresShipping(cart);            
+            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !_shoppingCartService.ShoppingCartRequiresShipping(cart);
         }
 
         /// <summary>
@@ -181,14 +180,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             //it's not a redirection payment method. So we always return false
             return false;
         }
-      
+
         public IList<string> ValidatePaymentForm(IFormCollection form)
         {
             var warnings = new List<string>();
 
             return warnings;
         }
-        
+
         public ProcessPaymentRequest GetPaymentInfo(IFormCollection form)
         {
             var paymentInfo = new ProcessPaymentRequest();
@@ -199,7 +198,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public override string GetConfigurationPageUrl()
         {
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
-        }        
+        }
 
         public Type GetControllerType()
         {
@@ -224,10 +223,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
-            
+
             base.Install();
         }
-        
+
         public override void Uninstall()
         {
             //settings
@@ -243,7 +242,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
-            
+
             base.Uninstall();
         }
 
@@ -263,79 +262,37 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <summary>
         /// Gets a value indicating whether capture is supported
         /// </summary>
-        public bool SupportCapture
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportCapture => false;
 
         /// <summary>
         /// Gets a value indicating whether partial refund is supported
         /// </summary>
-        public bool SupportPartiallyRefund
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportPartiallyRefund => false;
 
         /// <summary>
         /// Gets a value indicating whether refund is supported
         /// </summary>
-        public bool SupportRefund
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportRefund => false;
 
         /// <summary>
         /// Gets a value indicating whether void is supported
         /// </summary>
-        public bool SupportVoid
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportVoid => false;
 
         /// <summary>
         /// Gets a recurring payment type of payment method
         /// </summary>
-        public RecurringPaymentType RecurringPaymentType
-        {
-            get
-            {
-                return RecurringPaymentType.NotSupported;
-            }
-        }
+        public RecurringPaymentType RecurringPaymentType => RecurringPaymentType.NotSupported;
 
         /// <summary>
         /// Gets a payment method type
         /// </summary>
-        public PaymentMethodType PaymentMethodType
-        {
-            get
-            {
-                return PaymentMethodType.Standard;
-            }
-        }
+        public PaymentMethodType PaymentMethodType => PaymentMethodType.Standard;
 
         /// <summary>
         /// Gets a value indicating whether we should display a payment information page for this plugin
         /// </summary>
-        public bool SkipPaymentInfo
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SkipPaymentInfo => false;
 
         /// <summary>
         /// Gets a payment method description that will be displayed on checkout pages in the public store
