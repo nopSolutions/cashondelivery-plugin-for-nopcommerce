@@ -14,29 +14,29 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 @(Html.LocalizedEditor<ConfigurationModel, ConfigurationModel.ConfigurationLocalizedModel>("plugin-settings-localized",
-                @<div class="form-group">
-                    <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="Locales[item].DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
-                        <nop-label asp-for="Locales[item].DescriptionText" />
-                    </div>
-                    <div class="col-md-9">
-                        <nop-textarea asp-for="Locales[item].DescriptionText"/>
-                        <span asp-validation-for="Locales[item].DescriptionText"></span>
-                        @Html.HiddenFor(model => model.Locales[item].LanguageId)
-                    </div>
-                </div>,
-                @<div class="form-group">
-                    <div class="col-md-3">
-                        <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
-                        <nop-label asp-for="DescriptionText" />
-                    </div>
-                    <div class="col-md-9">
-                        <nop-textarea asp-for="DescriptionText" />
-                        <span asp-validation-for="DescriptionText"></span>
-                    </div>
-                </div>,
-                //localizable settings per store (overrriden store settings) are not supported yet
-                true))
+                        @<div class="form-group">
+                            <div class="col-md-3">
+                                <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="Locales[item].DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                                <nop-label asp-for="Locales[item].DescriptionText" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-textarea asp-for="Locales[item].DescriptionText" />
+                                <span asp-validation-for="Locales[item].DescriptionText"></span>
+                                @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                            </div>
+                        </div>,
+                        @<div class="form-group">
+                            <div class="col-md-3">
+                                <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                                <nop-label asp-for="DescriptionText" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-textarea asp-for="DescriptionText" />
+                                <span asp-validation-for="DescriptionText"></span>
+                            </div>
+                        </div>,
+                        //localizable settings per store (overrriden store settings) are not supported yet
+                        true))
                 <div class="form-group">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="AdditionalFee_OverrideForStore" asp-input="AdditionalFee" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
@@ -65,6 +65,16 @@
                     <div class="col-md-9">
                         <nop-editor asp-for="ShippableProductRequired" />
                         <span asp-validation-for="ShippableProductRequired"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="SkipPaymentInfo_OverrideForStore" asp-input="SkipPaymentInfo" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="SkipPaymentInfo" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="SkipPaymentInfo" />
+                        <span asp-validation-for="SkipPaymentInfo"></span>
                     </div>
                 </div>
                 <div class="form-group">

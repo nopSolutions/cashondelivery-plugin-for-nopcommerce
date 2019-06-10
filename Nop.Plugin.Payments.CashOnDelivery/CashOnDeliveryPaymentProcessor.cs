@@ -209,7 +209,8 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         {
             var settings = new CashOnDeliveryPaymentSettings
             {
-                DescriptionText = "<p>In cases where an order is placed, an authorized representative will contact you, personally or over telephone, to confirm the order.<br />After the order is confirmed, it will be processed.<br />Orders once confirmed, cannot be cancelled.</p><p>P.S. You can edit this text from admin panel.</p>"
+                DescriptionText = "<p>In cases where an order is placed, an authorized representative will contact you, personally or over telephone, to confirm the order.<br />After the order is confirmed, it will be processed.<br />Orders once confirmed, cannot be cancelled.</p><p>P.S. You can edit this text from admin panel.</p>",
+                SkipPaymentInfo = false
             };
 
             _settingService.SaveSetting(settings);
@@ -223,7 +224,8 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
-
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo", "Skip payment information page"); 
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint", "An option indicating whether we should display a payment information page for this plugin.");
             base.Install();
         }
 
@@ -242,6 +244,8 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
             _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo");
+            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint");
 
             base.Uninstall();
         }
@@ -292,14 +296,17 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <summary>
         /// Gets a value indicating whether we should display a payment information page for this plugin
         /// </summary>
-        public bool SkipPaymentInfo => false;
+        public bool SkipPaymentInfo => _cashOnDeliveryPaymentSettings.SkipPaymentInfo;
 
         /// <summary>
         /// Gets a payment method description that will be displayed on checkout pages in the public store
         /// </summary>
         public string PaymentMethodDescription
         {
-            get { return _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription"); }
+            get
+            {
+                return _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
+            }
         }
 
         #endregion

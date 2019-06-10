@@ -35,6 +35,11 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Models
 
         public bool ShippableProductRequired_OverrideForStore { get; set; }
 
+        [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.SkipPaymentInfo")]
+        public bool SkipPaymentInfo { get; set; }
+
+        public bool SkipPaymentInfo_OverrideForStore { get; set; }
+
         #region Nested class
 
         public partial class ConfigurationLocalizedModel : ILocalizedLocaleModel
