@@ -71,7 +71,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             model.AdditionalFeePercentage = cashOnDeliveryPaymentSettings.AdditionalFeePercentage;
             model.ShippableProductRequired = cashOnDeliveryPaymentSettings.ShippableProductRequired;
             model.SkipPaymentInfo = cashOnDeliveryPaymentSettings.SkipPaymentInfo;
-            model.ActiveStoreScopeConfiguration = storeScope;            
+            model.ActiveStoreScopeConfiguration = storeScope;
 
             if (storeScope > 0)
             {

@@ -22,14 +22,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
         #region Ctor
 
         public PaymentCashOnDeliveryViewComponent(ILocalizationService localizationService,
-            IStoreContext storeContext,
             ISettingService settingService,
+            IStoreContext storeContext,
             IWorkContext workContext)
         {
-            _workContext = workContext;
-            _settingService = settingService;
             _localizationService = localizationService;
+            _settingService = settingService;
             _storeContext = storeContext;
+            _workContext = workContext;
         }
 
         #endregion

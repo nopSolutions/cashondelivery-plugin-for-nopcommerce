@@ -224,7 +224,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo", "Skip payment information page"); 
+            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo", "Skip payment information page");
             _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint", "An option indicating whether we should display a payment information page for this plugin.");
             base.Install();
         }
