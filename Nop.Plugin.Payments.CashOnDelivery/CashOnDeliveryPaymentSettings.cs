@@ -2,10 +2,13 @@
 
 namespace Nop.Plugin.Payments.CashOnDelivery
 {
+    /// <summary>
+    /// Represents plugin settings
+    /// </summary>
     public class CashOnDeliveryPaymentSettings : ISettings
     {
         /// <summary>
-        /// Additional fee
+        /// Gets or sets a additional fee
         /// </summary>
         public decimal AdditionalFee { get; set; }
 
@@ -14,6 +17,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         public bool AdditionalFeePercentage { get; set; }
 
+        /// <summary>
+        /// Gets or sets a payment information 
+        /// </summary>
         public string DescriptionText { get; set; }
 
         /// <summary>
@@ -21,6 +27,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         public bool ShippableProductRequired { get; set; }
 
+        /// <summary>
+        /// Gets a value indicating whether we should display a payment information page for this plugin
+        /// </summary>
         public bool SkipPaymentInfo { get; set; }
     }
 }

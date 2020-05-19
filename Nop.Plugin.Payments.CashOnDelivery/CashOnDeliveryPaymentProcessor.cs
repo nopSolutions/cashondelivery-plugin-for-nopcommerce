@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
-using Nop.Plugin.Payments.CashOnDelivery.Controllers;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
@@ -57,9 +56,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>Process payment result</returns>
         public ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
         {
-            var result = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
-
-            return result;
+            return new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
         }
 
         /// <summary>
@@ -183,26 +180,17 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
         public IList<string> ValidatePaymentForm(IFormCollection form)
         {
-            var warnings = new List<string>();
-
-            return warnings;
+            return new List<string>();
         }
 
         public ProcessPaymentRequest GetPaymentInfo(IFormCollection form)
         {
-            var paymentInfo = new ProcessPaymentRequest();
-
-            return paymentInfo;
+            return new ProcessPaymentRequest();
         }
 
         public override string GetConfigurationPageUrl()
         {
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
-        }
-
-        public Type GetControllerType()
-        {
-            return typeof(PaymentCashOnDeliveryController);
         }
 
         public override void Install()
@@ -212,20 +200,24 @@ namespace Nop.Plugin.Payments.CashOnDelivery
                 DescriptionText = "<p>In cases where an order is placed, an authorized representative will contact you, personally or over telephone, to confirm the order.<br />After the order is confirmed, it will be processed.<br />Orders once confirmed, cannot be cancelled.</p><p>P.S. You can edit this text from admin panel.</p>",
                 SkipPaymentInfo = false
             };
-
             _settingService.SaveSetting(settings);
 
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText", "Description");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint", "Enter info that will be shown to customers during checkout");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee", "Additional fee");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint", "The additional fee.");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage", "Additional fee. Use percentage");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint", "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired", "Shippable product required");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint", "An option indicating whether shippable products are required in order to display this payment method during checkout.");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription", "Pay by \"Cash on delivery\"");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo", "Skip payment information page");
-            _localizationService.AddOrUpdatePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint", "An option indicating whether we should display a payment information page for this plugin.");
+            //locales
+            _localizationService.AddPluginLocaleResource(new Dictionary<string, string>
+            {
+                ["Plugins.Payment.CashOnDelivery.DescriptionText"] = "Description",
+                ["Plugins.Payment.CashOnDelivery.DescriptionText.Hint"] = "Enter info that will be shown to customers during checkout",
+                ["Plugins.Payment.CashOnDelivery.AdditionalFee"] = "Additional fee",
+                ["Plugins.Payment.CashOnDelivery.AdditionalFee.Hint"] = "The additional fee.",
+                ["Plugins.Payment.CashOnDelivery.AdditionalFeePercentage"] = "Additional fee. Use percentage",
+                ["Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint"] = "Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.",
+                ["Plugins.Payment.CashOnDelivery.ShippableProductRequired"] = "Shippable product required",
+                ["Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint"] = "An option indicating whether shippable products are required in order to display this payment method during checkout.",
+                ["Plugins.Payment.CashOnDelivery.PaymentMethodDescription"] = "Pay by \"Cash on delivery\"",
+                ["Plugins.Payment.CashOnDelivery.SkipPaymentInfo"] = "Skip payment information page",
+                ["Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint"] = "An option indicating whether we should display a payment information page for this plugin."
+            });
+
             base.Install();
         }
 
@@ -235,17 +227,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             _settingService.DeleteSetting<CashOnDeliveryPaymentSettings>();
 
             //locales
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.DescriptionText.Hint");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFee.Hint");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.AdditionalFeePercentage.Hint");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.ShippableProductRequired.Hint");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo");
-            _localizationService.DeletePluginLocaleResource("Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint");
+            _localizationService.DeletePluginLocaleResources("Plugins.Payment.CashOnDelivery");
 
             base.Uninstall();
         }
@@ -301,13 +283,11 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <summary>
         /// Gets a payment method description that will be displayed on checkout pages in the public store
         /// </summary>
-        public string PaymentMethodDescription
-        {
-            get
-            {
-                return _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
-            }
-        }
+        /// <remarks>
+        /// return description of this payment method to be display on "payment method" checkout step. good practice is to make it localizable
+        /// for example, for a redirection payment method, description may be like this: "You will be redirected to PayPal site to complete the payment"
+        /// </remarks>
+        public string PaymentMethodDescription => _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
 
         #endregion
     }
