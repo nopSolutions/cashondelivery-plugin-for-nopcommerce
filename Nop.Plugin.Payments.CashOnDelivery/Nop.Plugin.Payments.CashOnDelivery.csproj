@@ -6,7 +6,7 @@
     <Company>Nop Solutions, Ltd</Company> 
     <Authors>Nop Solutions, Ltd</Authors> 
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageProjectUrl>https://www.nopcommerce.com/p/1618/cash-on-delivery-payment-module-nopcommerce-team.aspx</PackageProjectUrl>
+    <PackageProjectUrl>https://www.nopcommerce.com/cash-on-delivery-payment-module</PackageProjectUrl>
     <RepositoryUrl>https://github.com/nopSolutions/cashondelivery-plugin-for-nopcommerce</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <OutputPath>..\..\Presentation\Nop.Web\Plugins\Payments.CashOnDelivery</OutputPath>
