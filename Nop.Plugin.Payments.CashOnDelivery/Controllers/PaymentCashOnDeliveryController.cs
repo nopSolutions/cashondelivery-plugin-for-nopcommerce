@@ -13,6 +13,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 {
     [AuthorizeAdmin]
     [Area(AreaNames.Admin)]
+    [AutoValidateAntiforgeryToken]
     public class PaymentCashOnDeliveryController : BasePaymentController
     {
         #region Fields

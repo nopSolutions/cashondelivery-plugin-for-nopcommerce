@@ -4,7 +4,7 @@ using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Plugin.Payments.CashOnDelivery.Models
 {
-    public class ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationModel.ConfigurationLocalizedModel>
+    public class ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationLocalizedModel>
     {
         public ConfigurationModel()
         {
@@ -39,17 +39,5 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Models
         public bool SkipPaymentInfo { get; set; }
 
         public bool SkipPaymentInfo_OverrideForStore { get; set; }
-
-        #region Nested class
-
-        public partial class ConfigurationLocalizedModel : ILocalizedLocaleModel
-        {
-            [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.DescriptionText")]
-            public string DescriptionText { get; set; }
-
-            public int LanguageId { get; set; }
-        }
-
-        #endregion
     }
 }

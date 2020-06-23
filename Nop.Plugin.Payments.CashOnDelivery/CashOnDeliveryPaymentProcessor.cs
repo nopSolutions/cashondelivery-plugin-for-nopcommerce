@@ -238,7 +238,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>View component name</returns>
         public string GetPublicViewComponentName()
         {
-            return "PaymentCashOnDelivery";
+            return CashOnDeliveryDefaults.PAYMENT_INFO_VIEW_COMPONENT_NAME;
         }
 
         #endregion
