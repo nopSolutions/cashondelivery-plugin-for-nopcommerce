@@ -13,7 +13,7 @@
     <div class="panel-group">
         <div class="panel panel-default">
             <div class="panel-body">
-                @(Html.LocalizedEditor<ConfigurationModel, ConfigurationModel.ConfigurationLocalizedModel>("plugin-settings-localized",
+                @(Html.LocalizedEditor<ConfigurationModel, ConfigurationLocalizedModel>("plugin-settings-localized",
                     @<div class="form-group">
                         <div class="col-md-3">
                             <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="Locales[item].DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
