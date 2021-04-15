@@ -3,7 +3,7 @@ using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Plugin.Payments.CashOnDelivery.Models
 {
-    public partial class ConfigurationLocalizedModel : ILocalizedLocaleModel
+    public record ConfigurationLocalizedModel : ILocalizedLocaleModel
     {
         [NopResourceDisplayName("Plugins.Payment.CashOnDelivery.DescriptionText")]
         public string DescriptionText { get; set; }

@@ -4,7 +4,7 @@ using Nop.Web.Framework.Mvc.ModelBinding;
 
 namespace Nop.Plugin.Payments.CashOnDelivery.Models
 {
-    public class ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationLocalizedModel>
+    public record ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationLocalizedModel>
     {
         public ConfigurationModel()
         {

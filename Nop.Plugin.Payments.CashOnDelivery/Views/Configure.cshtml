@@ -10,11 +10,11 @@
 @await Component.InvokeAsync("StoreScopeConfiguration")
 
 <form asp-controller="PaymentCashOnDelivery" asp-action="Configure" method="post">
-    <div class="panel-group">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                @(Html.LocalizedEditor<ConfigurationModel, ConfigurationLocalizedModel>("plugin-settings-localized",
-                    @<div class="form-group">
+    <div class="cards-group">
+        <div class="card card-default">
+            <div class="card-body">
+                @(await Html.LocalizedEditorAsync<ConfigurationModel, ConfigurationLocalizedModel>("plugin-settings-localized",
+                    @<div class="form-group row">
                         <div class="col-md-3">
                             <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="Locales[item].DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                             <nop-label asp-for="Locales[item].DescriptionText" />
@@ -25,7 +25,7 @@
                             @Html.HiddenFor(model => model.Locales[item].LanguageId)
                         </div>
                     </div>,
-                    @<div class="form-group">
+                    @<div class="form-group row">
                         <div class="col-md-3">
                             <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                             <nop-label asp-for="DescriptionText" />
@@ -37,7 +37,7 @@
                     </div>,
                     //localizable settings per store (overrriden store settings) are not supported yet
                     true))
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="AdditionalFee_OverrideForStore" asp-input="AdditionalFee" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="AdditionalFee" />
@@ -47,7 +47,7 @@
                         <span asp-validation-for="AdditionalFee"></span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="AdditionalFeePercentage_OverrideForStore" asp-input="AdditionalFeePercentage" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="AdditionalFeePercentage" />
@@ -57,7 +57,7 @@
                         <span asp-validation-for="AdditionalFeePercentage"></span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="ShippableProductRequired_OverrideForStore" asp-input="ShippableProductRequired" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="ShippableProductRequired" />
@@ -67,7 +67,7 @@
                         <span asp-validation-for="ShippableProductRequired"></span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-md-3">
                         <nop-override-store-checkbox asp-for="SkipPaymentInfo_OverrideForStore" asp-input="SkipPaymentInfo" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
                         <nop-label asp-for="SkipPaymentInfo" />
@@ -77,9 +77,9 @@
                         <span asp-validation-for="SkipPaymentInfo"></span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group row">
                     <div class="col-md-9 col-md-offset-3">
-                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                        <button type="submit" name="save" class="btn btn-primary">@T("Admin.Common.Save")</button>
                     </div>
                 </div>
             </div>

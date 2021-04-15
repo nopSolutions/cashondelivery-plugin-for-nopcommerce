@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
@@ -36,13 +37,16 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Components
 
         #region Methods
 
-        public IViewComponentResult Invoke()
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public async Task<IViewComponentResult> InvokeAsync()
         {
-            var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(_storeContext.CurrentStore.Id);
+            var currentStore = await _storeContext.GetCurrentStoreAsync();
+            var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+            var cashOnDeliveryPaymentSettings = await _settingService.LoadSettingAsync<CashOnDeliveryPaymentSettings>(currentStore.Id);
 
             var model = new PaymentInfoModel
             {
-                DescriptionText = _localizationService.GetLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, _workContext.WorkingLanguage.Id, 0)
+                DescriptionText = await _localizationService.GetLocalizedSettingAsync(cashOnDeliveryPaymentSettings, x => x.DescriptionText, currentLanguage.Id, 0)
             };
 
             return View("~/Plugins/Payments.CashOnDelivery/Views/PaymentInfo.cshtml", model);

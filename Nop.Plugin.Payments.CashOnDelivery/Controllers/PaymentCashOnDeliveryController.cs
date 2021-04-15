@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
@@ -48,14 +49,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 
         #region Methods
 
-        public IActionResult Configure()
+        public async Task<IActionResult> Configure()
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManagePaymentMethods))
                 return AccessDeniedView();
 
             //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
+            var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+            var cashOnDeliveryPaymentSettings = await _settingService.LoadSettingAsync<CashOnDeliveryPaymentSettings>(storeScope);
 
             var model = new ConfigurationModel
             {
@@ -63,9 +64,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             };
 
             //locales
-            AddLocales(_languageService, model.Locales, (locale, languageId) =>
+            await AddLocalesAsync(_languageService, model.Locales, async (locale, languageId) =>
             {
-                locale.DescriptionText = _localizationService.GetLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText, languageId, 0, false, false);
+                locale.DescriptionText = await _localizationService.GetLocalizedSettingAsync(cashOnDeliveryPaymentSettings, x => x.DescriptionText, languageId, 0, false, false);
             });
 
             model.AdditionalFee = cashOnDeliveryPaymentSettings.AdditionalFee;
@@ -76,28 +77,28 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
 
             if (storeScope > 0)
             {
-                model.DescriptionText_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.DescriptionText, storeScope);
-                model.AdditionalFee_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, storeScope);
-                model.AdditionalFeePercentage_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
-                model.ShippableProductRequired_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, storeScope);
-                model.SkipPaymentInfo_OverrideForStore = _settingService.SettingExists(cashOnDeliveryPaymentSettings, x => x.SkipPaymentInfo, storeScope);
+                model.DescriptionText_OverrideForStore = await _settingService.SettingExistsAsync(cashOnDeliveryPaymentSettings, x => x.DescriptionText, storeScope);
+                model.AdditionalFee_OverrideForStore = await _settingService.SettingExistsAsync(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, storeScope);
+                model.AdditionalFeePercentage_OverrideForStore = await _settingService.SettingExistsAsync(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
+                model.ShippableProductRequired_OverrideForStore = await _settingService.SettingExistsAsync(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, storeScope);
+                model.SkipPaymentInfo_OverrideForStore = await _settingService.SettingExistsAsync(cashOnDeliveryPaymentSettings, x => x.SkipPaymentInfo, storeScope);
             }
 
             return View("~/Plugins/Payments.CashOnDelivery/Views/Configure.cshtml", model);
         }
 
         [HttpPost]
-        public IActionResult Configure(ConfigurationModel model)
+        public async Task<IActionResult> Configure(ConfigurationModel model)
         {
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+            if (!await _permissionService.AuthorizeAsync(StandardPermissionProvider.ManagePaymentMethods))
                 return AccessDeniedView();
 
             if (!ModelState.IsValid)
-                return Configure();
+                return await Configure();
 
             //load settings for a chosen store scope
-            var storeScope = _storeContext.ActiveStoreScopeConfiguration;
-            var cashOnDeliveryPaymentSettings = _settingService.LoadSetting<CashOnDeliveryPaymentSettings>(storeScope);
+            var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+            var cashOnDeliveryPaymentSettings = await _settingService.LoadSettingAsync<CashOnDeliveryPaymentSettings>(storeScope);
 
             //save settings
             cashOnDeliveryPaymentSettings.DescriptionText = model.DescriptionText;
@@ -109,26 +110,26 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             /* We do not clear cache after each setting update.
              * This behavior can increase performance because cached settings will not be cleared 
              * and loaded from database after each update */
-            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.DescriptionText, model.DescriptionText_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, model.AdditionalFee_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, model.AdditionalFeePercentage_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, model.ShippableProductRequired_OverrideForStore, storeScope, false);
-            _settingService.SaveSettingOverridablePerStore(cashOnDeliveryPaymentSettings, x => x.SkipPaymentInfo, model.SkipPaymentInfo_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(cashOnDeliveryPaymentSettings, x => x.DescriptionText, model.DescriptionText_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(cashOnDeliveryPaymentSettings, x => x.AdditionalFee, model.AdditionalFee_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(cashOnDeliveryPaymentSettings, x => x.AdditionalFeePercentage, model.AdditionalFeePercentage_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(cashOnDeliveryPaymentSettings, x => x.ShippableProductRequired, model.ShippableProductRequired_OverrideForStore, storeScope, false);
+            await _settingService.SaveSettingOverridablePerStoreAsync(cashOnDeliveryPaymentSettings, x => x.SkipPaymentInfo, model.SkipPaymentInfo_OverrideForStore, storeScope, false);
 
             //now clear settings cache
-            _settingService.ClearCache();
+            await _settingService.ClearCacheAsync();
 
             //localization. no multi-store support for localization yet.
             foreach (var localized in model.Locales)
             {
-                _localizationService.SaveLocalizedSetting(cashOnDeliveryPaymentSettings, x => x.DescriptionText,
+                await _localizationService.SaveLocalizedSettingAsync(cashOnDeliveryPaymentSettings, x => x.DescriptionText,
                     localized.LanguageId,
                     localized.DescriptionText);
             }
 
-            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
+            _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
-            return Configure();
+            return await Configure();
         }
 
         #endregion

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
+using Nop.Plugin.Payments.CashOnDelivery.Controllers;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
@@ -54,18 +56,19 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
+        public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
-            return new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending };
+            return Task.FromResult(new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Pending });
         }
 
         /// <summary>
         /// Post process payment (used by payment gateways that require redirecting to a third-party URL)
         /// </summary>
         /// <param name="postProcessPaymentRequest">Payment info required for an order processing</param>
-        public void PostProcessPayment(PostProcessPaymentRequest postProcessPaymentRequest)
+        public Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
         {
             //nothing
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -73,12 +76,12 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>true - hide; false - display.</returns>
-        public bool HidePaymentMethod(IList<ShoppingCartItem> cart)
+        public async Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
         {
             //you can put any logic here
             //for example, hide this payment method if all products in the cart are downloadable
             //or hide this payment method if current customer is from certain country
-            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !_shoppingCartService.ShoppingCartRequiresShipping(cart);
+            return _cashOnDeliveryPaymentSettings.ShippableProductRequired && !await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
         }
 
         /// <summary>
@@ -86,12 +89,10 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="cart">Shoping cart</param>
         /// <returns>Additional handling fee</returns>
-        public decimal GetAdditionalHandlingFee(IList<ShoppingCartItem> cart)
+        public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            var result = _paymentService.CalculateAdditionalFee(cart,
+            return await _paymentService.CalculateAdditionalFeeAsync(cart,
                 _cashOnDeliveryPaymentSettings.AdditionalFee, _cashOnDeliveryPaymentSettings.AdditionalFeePercentage);
-
-            return result;
         }
 
         /// <summary>
@@ -99,13 +100,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="capturePaymentRequest">Capture payment request</param>
         /// <returns>Capture payment result</returns>
-        public CapturePaymentResult Capture(CapturePaymentRequest capturePaymentRequest)
+        public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
         {
-            var result = new CapturePaymentResult();
-
-            result.AddError("Capture method not supported");
-
-            return result;
+            return Task.FromResult(new CapturePaymentResult { Errors = new[] { "Capture method not supported" } });
         }
 
         /// <summary>
@@ -113,13 +110,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="refundPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public RefundPaymentResult Refund(RefundPaymentRequest refundPaymentRequest)
+        public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
         {
-            var result = new RefundPaymentResult();
-
-            result.AddError("Refund method not supported");
-
-            return result;
+            return Task.FromResult(new RefundPaymentResult { Errors = new[] { "Refund method not supported" } });
         }
 
         /// <summary>
@@ -127,13 +120,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="voidPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public VoidPaymentResult Void(VoidPaymentRequest voidPaymentRequest)
+        public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
         {
-            var result = new VoidPaymentResult();
-
-            result.AddError("Void method not supported");
-
-            return result;
+            return Task.FromResult(new VoidPaymentResult { Errors = new[] { "Void method not supported" } });
         }
 
         /// <summary>
@@ -141,13 +130,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="processPaymentRequest">Payment info required for an order processing</param>
         /// <returns>Process payment result</returns>
-        public ProcessPaymentResult ProcessRecurringPayment(ProcessPaymentRequest processPaymentRequest)
+        public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
         {
-            var result = new ProcessPaymentResult();
-
-            result.AddError("Recurring payment not supported");
-
-            return result;
+            return Task.FromResult(new ProcessPaymentResult { Errors = new[] { "Recurring payment not supported" } });
         }
 
         /// <summary>
@@ -155,13 +140,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="cancelPaymentRequest">Request</param>
         /// <returns>Result</returns>
-        public CancelRecurringPaymentResult CancelRecurringPayment(CancelRecurringPaymentRequest cancelPaymentRequest)
+        public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
         {
-            var result = new CancelRecurringPaymentResult();
-
-            result.AddError("Recurring payment not supported");
-
-            return result;
+            return Task.FromResult(new CancelRecurringPaymentResult { Errors = new[] { "Recurring payment not supported" } });
         }
 
         /// <summary>
@@ -169,23 +150,23 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// </summary>
         /// <param name="order">Order</param>
         /// <returns>Result</returns>
-        public bool CanRePostProcessPayment(Order order)
+        public Task<bool> CanRePostProcessPaymentAsync(Order order)
         {
             if (order == null)
                 throw new ArgumentNullException(nameof(order));
 
             //it's not a redirection payment method. So we always return false
-            return false;
+            return Task.FromResult(false);
         }
 
-        public IList<string> ValidatePaymentForm(IFormCollection form)
+        public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
         {
-            return new List<string>();
+            return Task.FromResult<IList<string>>(new List<string>());
         }
 
-        public ProcessPaymentRequest GetPaymentInfo(IFormCollection form)
+        public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
         {
-            return new ProcessPaymentRequest();
+            return Task.FromResult(new ProcessPaymentRequest());
         }
 
         public override string GetConfigurationPageUrl()
@@ -193,17 +174,18 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
         }
 
-        public override void Install()
+        public override async Task InstallAsync()
         {
             var settings = new CashOnDeliveryPaymentSettings
             {
                 DescriptionText = "<p>In cases where an order is placed, an authorized representative will contact you, personally or over telephone, to confirm the order.<br />After the order is confirmed, it will be processed.<br />Orders once confirmed, cannot be cancelled.</p><p>P.S. You can edit this text from admin panel.</p>",
                 SkipPaymentInfo = false
             };
-            _settingService.SaveSetting(settings);
+
+            await _settingService.SaveSettingAsync(settings);
 
             //locales
-            _localizationService.AddPluginLocaleResource(new Dictionary<string, string>
+            await _localizationService.AddLocaleResourceAsync(new Dictionary<string, string>
             {
                 ["Plugins.Payment.CashOnDelivery.DescriptionText"] = "Description",
                 ["Plugins.Payment.CashOnDelivery.DescriptionText.Hint"] = "Enter info that will be shown to customers during checkout",
@@ -218,18 +200,18 @@ namespace Nop.Plugin.Payments.CashOnDelivery
                 ["Plugins.Payment.CashOnDelivery.SkipPaymentInfo.Hint"] = "An option indicating whether we should display a payment information page for this plugin."
             });
 
-            base.Install();
+            await base.InstallAsync();
         }
 
-        public override void Uninstall()
+        public override async Task UninstallAsync()
         {
             //settings
-            _settingService.DeleteSetting<CashOnDeliveryPaymentSettings>();
+            await _settingService.DeleteSettingAsync<CashOnDeliveryPaymentSettings>();
 
             //locales
-            _localizationService.DeletePluginLocaleResources("Plugins.Payment.CashOnDelivery");
+            await _localizationService.DeleteLocaleResourcesAsync("Plugins.Payment.CashOnDelivery");
 
-            base.Uninstall();
+            await base.UninstallAsync();
         }
 
         /// <summary>
@@ -239,6 +221,19 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         public string GetPublicViewComponentName()
         {
             return CashOnDeliveryDefaults.PAYMENT_INFO_VIEW_COMPONENT_NAME;
+        }
+
+        /// <summary>
+        /// Gets a payment method description that will be displayed on checkout pages in the public store
+        /// </summary>
+        /// <remarks>
+        /// return description of this payment method to be display on "payment method" checkout step. good practice is to make it localizable
+        /// for example, for a redirection payment method, description may be like this: "You will be redirected to PayPal site to complete the payment"
+        /// </remarks>
+        /// <returns>A task that represents the asynchronous operation</returns>
+        public async Task<string> GetPaymentMethodDescriptionAsync()
+        {
+            return await _localizationService.GetResourceAsync("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
         }
 
         #endregion
@@ -279,15 +274,6 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// Gets a value indicating whether we should display a payment information page for this plugin
         /// </summary>
         public bool SkipPaymentInfo => _cashOnDeliveryPaymentSettings.SkipPaymentInfo;
-
-        /// <summary>
-        /// Gets a payment method description that will be displayed on checkout pages in the public store
-        /// </summary>
-        /// <remarks>
-        /// return description of this payment method to be display on "payment method" checkout step. good practice is to make it localizable
-        /// for example, for a redirection payment method, description may be like this: "You will be redirected to PayPal site to complete the payment"
-        /// </remarks>
-        public string PaymentMethodDescription => _localizationService.GetResource("Plugins.Payment.CashOnDelivery.PaymentMethodDescription");
 
         #endregion
     }
