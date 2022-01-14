@@ -23,7 +23,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
         private readonly CashOnDeliveryPaymentSettings _cashOnDeliveryPaymentSettings;
         private readonly ILocalizationService _localizationService;
-        private readonly IPaymentService _paymentService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly ISettingService _settingService;
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IWebHelper _webHelper;
@@ -34,14 +34,14 @@ namespace Nop.Plugin.Payments.CashOnDelivery
 
         public CashOnDeliveryPaymentProcessor(CashOnDeliveryPaymentSettings cashOnDeliveryPaymentSettings,
             ILocalizationService localizationService,
-            IPaymentService paymentService,
+            IOrderTotalCalculationService orderTotalCalculationService,
             ISettingService settingService,
             IShoppingCartService shoppingCartService,
             IWebHelper webHelper)
         {
             _cashOnDeliveryPaymentSettings = cashOnDeliveryPaymentSettings;
             _localizationService = localizationService;
-            _paymentService = paymentService;
+            _orderTotalCalculationService = orderTotalCalculationService;
             _settingService = settingService;
             _shoppingCartService = shoppingCartService;
             _webHelper = webHelper;
@@ -91,7 +91,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// <returns>Additional handling fee</returns>
         public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            return await _paymentService.CalculateAdditionalFeeAsync(cart,
+            return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
                 _cashOnDeliveryPaymentSettings.AdditionalFee, _cashOnDeliveryPaymentSettings.AdditionalFeePercentage);
         }
 
@@ -185,7 +185,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery
             await _settingService.SaveSettingAsync(settings);
 
             //locales
-            await _localizationService.AddLocaleResourceAsync(new Dictionary<string, string>
+            await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
             {
                 ["Plugins.Payment.CashOnDelivery.DescriptionText"] = "Description",
                 ["Plugins.Payment.CashOnDelivery.DescriptionText.Hint"] = "Enter info that will be shown to customers during checkout",
