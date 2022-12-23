@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
+using Nop.Plugin.Payments.CashOnDelivery.Components;
 using Nop.Plugin.Payments.CashOnDelivery.Controllers;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
@@ -218,9 +219,9 @@ namespace Nop.Plugin.Payments.CashOnDelivery
         /// Gets a name of a view component for displaying plugin in public store ("payment info" checkout step)
         /// </summary>
         /// <returns>View component name</returns>
-        public string GetPublicViewComponentName()
+        public Type GetPublicViewComponent()
         {
-            return CashOnDeliveryDefaults.PAYMENT_INFO_VIEW_COMPONENT_NAME;
+            return typeof(PaymentCashOnDeliveryViewComponent);
         }
 
         /// <summary>

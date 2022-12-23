@@ -8,7 +8,7 @@ using Nop.Web.Framework.Components;
 
 namespace Nop.Plugin.Payments.CashOnDelivery.Components
 {
-    [ViewComponent(Name = CashOnDeliveryDefaults.PAYMENT_INFO_VIEW_COMPONENT_NAME)]
+    [ViewComponent(Name = "PaymentCashOnDelivery")]
     public class PaymentCashOnDeliveryViewComponent : NopViewComponent
     {
         #region Fields
