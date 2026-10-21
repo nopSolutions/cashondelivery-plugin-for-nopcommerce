@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Nop.Core;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Plugin.Payments.CashOnDelivery.Components;
 using Nop.Services.Configuration;
+using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
@@ -155,21 +155,44 @@ public class CashOnDeliveryPaymentProcessor : BasePlugin, IPaymentMethod
         return Task.FromResult(false);
     }
 
+    /// <summary>
+    /// Validate payment form
+    /// </summary>
+    /// <param name="form">The parsed form values</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the list of validating errors
+    /// </returns>
     public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
     {
         return Task.FromResult<IList<string>>(new List<string>());
     }
 
+    /// <summary>
+    /// Get payment information
+    /// </summary>
+    /// <param name="form">The parsed form values</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation
+    /// The task result contains the payment info holder
+    /// </returns>
     public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
     {
         return Task.FromResult(new ProcessPaymentRequest());
     }
 
+    /// <summary>
+    /// Gets a configuration page URL
+    /// </summary>
     public override string GetConfigurationPageUrl()
     {
         return $"{_webHelper.GetStoreLocation()}Admin/PaymentCashOnDelivery/Configure";
     }
 
+    /// <summary>
+    /// Install the plugin
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
         var settings = new CashOnDeliveryPaymentSettings
@@ -199,6 +222,10 @@ public class CashOnDeliveryPaymentProcessor : BasePlugin, IPaymentMethod
         await base.InstallAsync();
     }
 
+    /// <summary>
+    /// Uninstall the plugin
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
         //settings
